@@ -21,7 +21,7 @@
 
   - Create a github repo and clone it to your desktop
   - cd in your directory
-  - Run: `mkdir src && mkdir src/app && touch src/index.html && touch src/app/index.js`
+  - Run: `mkdir src && mkdir src/app && touch src/index.html && touch src/app/app.js`
   
 ### Install Dependencies
 
