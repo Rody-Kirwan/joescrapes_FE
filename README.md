@@ -116,3 +116,8 @@ module.exports = {
   - change the message in app.js and save
   
   *app should rebuild with new alert message*
+  
+  ### Ignoring all of this you can just clone the repo and run
+  ```npm run build && npm run dev```
+
+  # Badabing!
