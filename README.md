@@ -79,4 +79,6 @@ module.exports = {
   "build": "webpack --config webpack-dev.config.js"
 },
 ```
+  - copy contents of included src/index.html and app.js
+
   - run `npm run build && npm run dev`
