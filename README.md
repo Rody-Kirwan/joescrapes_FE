@@ -79,6 +79,40 @@ module.exports = {
   "build": "webpack --config webpack-dev.config.js"
 },
 ```
-  - copy contents of included src/index.html and app.js
+  - copy the following to src/index.html
+  ```
+  <!doctype html>
+  <html>
+    <head>
+      <meta charset="utf-8">
+      <title>App Title</title>
+      <meta name="description" content="">
+      <meta name="viewport" content="width=device-width">
+
+    </head>
+    <body>
+      <div class="app" id="root">
+        LOADING
+      </div>
+    </body>
+  </html>
+  ```
+  
+  - copy the following to src/app/app.js
+  ```
+  export const testFunction = () => {
+    alert('Up and running here we go!')
+  }
+
+  testFunction();
+
+  ```
 
   - run `npm run build && npm run dev`
+  - open `http://localhost:3200`
+  
+  *you should now see the alert message from app.js*
+
+  - change the message in app.js and save
+  
+  *app should rebuild with new alert message*
