@@ -136,7 +136,7 @@ module.exports = {
   ```npm i -D eslint_d eslint-config-airbnb eslint-plugin-react eslint-plugin-import eslint-plugin-jsx-a11y git-pre-hooks```
 
 
-  - Copy the following json to a file called `.eslintrc` in the root directory
+  - Copy the following json to a file called `.eslintrc` in the root directory 
 
   ```
   {
@@ -203,6 +203,7 @@ module.exports = {
     }
   }
   ```
+  **See:** [https://eslint.org/docs/rules] *for more detail*
 
   - To you scripts object in package.json - add:
 
