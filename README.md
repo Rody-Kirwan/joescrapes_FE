@@ -227,3 +227,84 @@ module.exports = {
 
     export default testFunction;
     
+    
+ 
+# Add React Support and Initial React Component
+
+## Install Dependencies
+*React requires three dependencies to run properly*
+
+  - Run `npm i react react-dom prop-types`
+  
+*We also need the babel transpiler to understand react code written in .jsx*
+
+  - Run `npm i -D babel-cli babel-preset-react`
+  
+  - We also need to add a babel configuration file to the root directory: `touch .babelrc`
+  
+  - Then copy the following to .babelrc
+  
+    ```
+    {
+      "presets": ["env", "react"],
+      "plugins": ["transform-object-rest-spread", "transform-class-properties", "transform-es2015-modules-commonjs"]
+    }
+    ```
+  *these are extra plugins to convert some less supported es6 patterns*
+  
+  - Now we add our first react component in components/app/App.js [*I use a capital letter for component filenames*]
+  
+    ```
+    // src/components/app/App.js
+    import React, { Component } from 'react';
+    import PropTypes from 'prop-types';
+
+    class App extends Component {
+      static propTypes = {
+        title: PropTypes.string.isRequired
+      }
+
+      handleClick = (e) => {
+        alert(e);
+      }
+
+      render() {
+        const { title } = this.props;
+        return (
+          <div>
+            <h1>{title}</h1>
+            <button
+              onClick={((e) => {
+                this.handleClick(e);
+              })}
+            >
+              Test Click
+            </button>
+          </div>
+        );
+      }
+    }
+
+    export default App;
+    ```
+  
+  - Finally we need our root app.js file to import this component and render it within our index.html root <div>
+  
+    ```
+    // src/app/app.js
+    import React from 'react';
+    import { render } from 'react-dom';
+
+    import App from './components/app';
+
+    render(
+      <App title="My Test Title" />,
+      document.getElementById('root')
+    );
+    ```
+    
+ Now you should be able to run `npm run dev` and view your working component at `localhost:3200`
+ 
+ # BOSH!
+  
+
