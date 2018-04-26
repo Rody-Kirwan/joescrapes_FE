@@ -132,11 +132,11 @@ module.exports = {
 
   ### Install Lint Dependencies
 
-    - Run: `npm i -D eslint_d eslint-config-airbnb eslint-plugin-react eslint-plugin-import eslint-plugin-jsx-a11y git-pre-hooks`
+   - Run: `npm i -D eslint_d eslint-config-airbnb eslint-plugin-react eslint-plugin-import eslint-plugin-jsx-a11y git-pre-hooks`
 
-    - Copy the following json to a file called `.eslintrc` in the root directory
+   - Copy the following json to a file called `.eslintrc` in the root directory
 
-    ```
+    
     {
       "parser": "babel-eslint",
       "env": {
@@ -200,26 +200,30 @@ module.exports = {
         "consistent-return": "error"
       }
     }
-    ```
+    
 
-    - To you scripts object in package.json - add 
-    ```
+   - To you scripts object in package.json - add 
+   
+    
     "lint": "eslint_d src --ext js,jsx"
-    ```
-    *This tells the lint tests to run on any file in src with the extension .js or .jsx (react)*
+    
+    
+   *This tells the lint tests to run on any file in src with the extension .js or .jsx (react)*
 
-    - Finally we add the git-prehook to run the lint tests before we push. At the top-level in package.json add: 
-    ```
+   - Finally we add the git-prehook to run the lint tests before we push. At the top-level in package.json add:
+   
+    
     "git-pre-hooks": {
       "pre-push": "npm run lint"
     }
-    ```
+    
 
-    **Now if you try to commit and push your changes you should be blocked. You will need to update app.js to follow our new rules*
-    ```
+  *Now if you try to commit and push your changes you should be blocked. You will need to update app.js to follow our new rules*
+  
+    
     const testFunction = () => alert('Up and running here we go!');
 
     testFunction();
 
     export default testFunction;
-    ```
+    
