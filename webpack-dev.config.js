@@ -13,10 +13,19 @@ module.exports = {
     path: `${__dirname}/build/app/`, // Directory where bundle file will be put
     publicPath: '/build/' // public path to the app root
   },
-  mode: "development", // Determines how the bundle is built e.g(whether it's minified or not) - see: https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a 
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      }
+    ],
+  },
+  mode: 'development', // Determines how the bundle is built e.g(whether it's minified or not) - see: https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a 
   devtool: 'eval', // Again determines how the bundle is built - theres a few different options - eval is good for debugging in development
   devServer: {
-    contentBase: "./build", // This tells the devServer where to serve files from i.e where ever index.html is
+    contentBase: './build', // This tells the devServer where to serve files from i.e where ever index.html is
     port: 3200 // Port that the app will be served on - i.e http://localhost:3200
   },
   plugins: [
