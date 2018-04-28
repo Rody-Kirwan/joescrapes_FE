@@ -105,7 +105,6 @@ module.exports = {
   }
 
   testFunction();
-
   ```
 
   - run `npm run build && npm run dev`
@@ -118,7 +117,7 @@ module.exports = {
   *app should rebuild with new alert message*
   
   ### Ignoring all of this you can just clone the repo and run
-  ```npm run build && npm run dev```
+  `npm run build && npm run dev`
 
   # Badabing!
 
@@ -202,7 +201,7 @@ module.exports = {
     }
     
 
-   - To you scripts object in package.json - add 
+   - To your scripts object in package.json - add 
    
     
     "lint": "eslint_d src --ext js,jsx"
@@ -222,7 +221,7 @@ module.exports = {
   
     
     const testFunction = () => alert('Up and running here we go!');
-
+    
     testFunction();
 
     export default testFunction;
@@ -306,5 +305,3 @@ module.exports = {
  Now you should be able to run `npm run dev` and view your working component at `localhost:3200`
  
  # BOSH!
-  
-
