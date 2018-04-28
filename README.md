@@ -131,100 +131,177 @@ module.exports = {
 
   ### Install Lint Dependencies
 
-  - Run 
+   - Run: `npm i -D eslint_d eslint-config-airbnb eslint-plugin-react eslint-plugin-import eslint-plugin-jsx-a11y git-pre-hooks`
+
+   - Copy the following json to a file called `.eslintrc` in the root directory
+
     
-  ```npm i -D eslint_d eslint-config-airbnb eslint-plugin-react eslint-plugin-import eslint-plugin-jsx-a11y git-pre-hooks```
-
-
-  - Copy the following json to a file called `.eslintrc` in the root directory 
-
-  ```
-  {
-    "parser": "babel-eslint",
-    "env": {
-      "browser": true,
-      "es6": true
-    },
-    "extends": "airbnb",
-    "parserOptions": {
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
+    {
+      "parser": "babel-eslint",
+      "env": {
+        "browser": true,
+        "es6": true
+      },
+      "extends": "airbnb",
+      "parserOptions": {
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "jsx": true
+        }
+      },
+      "plugins": [
+        "react"
+      ],
+      "globals": {
+        "describe": true,
+        "jest": true,
+        "expect": true,
+        "it": true,
+        "beforeEach": true,
+        "spyOn": true,
+        "afterEach": true
+      },
+      "rules": {
+        "comma-dangle": [
+          "warn",
+          "never"
+        ],
+        "import/no-extraneous-dependencies": [
+          "error", 
+          { "devDependencies": true }
+        ],
+        "no-underscore-dangle": [
+          "error", { "allow": ["_id"] }
+        ],
+        "react/jsx-filename-extension": [
+          1,
+          { "extensions": [".js", ".jsx"] }
+        ],
+        "indent": [
+          "warn",
+          2
+        ],
+        "linebreak-style": [
+          "warn",
+          "unix"
+        ],
+        "quotes": [
+          "error",
+          "single"
+        ],
+        "semi": [
+          "error",
+          "always"
+        ],
+        "no-unused-expressions": "warn",
+        "no-useless-concat": "warn",
+        "block-scoped-var": "error",
+        "consistent-return": "error"
       }
-    },
-    "plugins": [
-      "react"
-    ],
-    "globals": {
-      "describe": true,
-      "jest": true,
-      "expect": true,
-      "it": true,
-      "beforeEach": true,
-      "spyOn": true,
-      "afterEach": true
-    },
-    "rules": {
-      "comma-dangle": [
-        "warn",
-        "never"
-      ],
-      "import/no-extraneous-dependencies": [
-        "error", 
-        { "devDependencies": true }
-      ],
-      "no-underscore-dangle": [
-        "error", { "allow": ["_id"] }
-      ],
-      "react/jsx-filename-extension": [
-        1,
-        { "extensions": [".js", ".jsx"] }
-      ],
-      "indent": [
-        "warn",
-        2
-      ],
-      "linebreak-style": [
-        "warn",
-        "unix"
-      ],
-      "quotes": [
-        "error",
-        "single"
-      ],
-      "semi": [
-        "error",
-        "always"
-      ],
-      "no-unused-expressions": "warn",
-      "no-useless-concat": "warn",
-      "block-scoped-var": "error",
-      "consistent-return": "error"
     }
-  }
-  ```
-  **See:** [https://eslint.org/docs/rules] *for more detail*
+    
 
-  - To you scripts object in package.json - add:
+   - To your scripts object in package.json - add 
+   
+    
+    "lint": "eslint_d src --ext js,jsx"
+    
+    
+   *This tells the lint tests to run on any file in src with the extension .js or .jsx (react)*
 
-  ```
-  "lint": "eslint_d src --ext js,jsx"
-  ```
-  *This tells the lint tests to run on any file in src with the extension .js or .jsx (react)*
+   - Finally we add the git-prehook to run the lint tests before we push. At the top-level in package.json add:
+   
+    
+    "git-pre-hooks": {
+      "pre-push": "npm run lint"
+    }
+    
 
-  - Finally we add the git-prehook to run the lint tests before we push. At the top-level in package.json add:
+  *Now if you try to commit and push your changes you should be blocked. You will need to update app.js to follow our new rules*
+  
+    
+    const testFunction = () => alert('Up and running here we go!');
+    
+    testFunction();
 
-  ```
-  "git-pre-hooks": {
-    "pre-push": "npm run lint"
-  }
-  ```
+    export default testFunction;
+    
+    
+ 
+# Add React Support and Initial React Component
 
-  **Now if you try to commit and push your changes you should be blocked. You will need to update app.js to follow our new rules*
-  ```
-  const testFunction = () => alert('Up and running here we go!');
+## Install Dependencies
+*React requires three dependencies to run properly*
 
-  testFunction();
+  - Run `npm i react react-dom prop-types`
+  
+*We also need the babel transpiler to understand react code written in .jsx*
 
-  export default testFunction;
-  ```
+  - Run `npm i -D babel-cli babel-preset-react`
+  
+  - We also need to add a babel configuration file to the root directory: `touch .babelrc`
+  
+  - Then copy the following to .babelrc
+  
+    ```
+    {
+      "presets": ["env", "react"],
+      "plugins": ["transform-object-rest-spread", "transform-class-properties", "transform-es2015-modules-commonjs"]
+    }
+    ```
+  *these are extra plugins to convert some less supported es6 patterns*
+  
+  - Now we add our first react component in components/app/App.js [*I use a capital letter for component filenames*]
+  
+    ```
+    // src/components/app/App.js
+    import React, { Component } from 'react';
+    import PropTypes from 'prop-types';
+
+    class App extends Component {
+      static propTypes = {
+        title: PropTypes.string.isRequired
+      }
+
+      handleClick = (e) => {
+        alert(e);
+      }
+
+      render() {
+        const { title } = this.props;
+        return (
+          <div>
+            <h1>{title}</h1>
+            <button
+              onClick={((e) => {
+                this.handleClick(e);
+              })}
+            >
+              Test Click
+            </button>
+          </div>
+        );
+      }
+    }
+
+    export default App;
+    ```
+  
+  - Finally we need our root app.js file to import this component and render it within our index.html root <div>
+  
+    ```
+    // src/app/app.js
+    import React from 'react';
+    import { render } from 'react-dom';
+
+    import App from './components/app';
+
+    render(
+      <App title="My Test Title" />,
+      document.getElementById('root')
+    );
+    ```
+    
+ Now you should be able to run `npm run dev` and view your working component at `localhost:3200`
+ 
+ # BOSH!

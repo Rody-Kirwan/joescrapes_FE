@@ -1,6 +1,9 @@
-const testFunction = () => alert('Up and running here we go!');
+import React from 'react';
+import { render } from 'react-dom';
 
-testFunction();
+import App from './components/app';
 
-export default testFunction;
-
+render(
+  <App title="My Test Title" />,
+  document.getElementById('root')
+);
