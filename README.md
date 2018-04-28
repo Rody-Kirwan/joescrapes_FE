@@ -239,6 +239,8 @@ module.exports = {
 
   - Run `npm i -D babel-cli babel-preset-react`
   
+ ## Configure Babel
+  
   - We also need to add a babel configuration file to the root directory: `touch .babelrc`
   
   - Then copy the following to .babelrc
@@ -250,6 +252,8 @@ module.exports = {
     }
     ```
   *these are extra plugins to convert some less supported es6 patterns*
+
+## Create an Initial App Container Component 
   
   - Now we add our first react component in components/app/App.js [*I use a capital letter for component filenames*]
   
@@ -286,7 +290,7 @@ module.exports = {
 
     export default App;
     ```
-  
+ 
   - Finally we need our root app.js file to import this component and render it within our index.html root <div>
   
     ```
@@ -305,3 +309,211 @@ module.exports = {
  Now you should be able to run `npm run dev` and view your working component at `localhost:3200`
  
  # BOSH!
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Add CSS support using SASS as a pre-processor
+
+*SASS is basically a pumped up CSS processor. You can use nesting, create variables and write functions that outpucan then be transpiled into normal CSS that any browser can read. The basic syntax is the same so not much of a learning curve from writing normal CSS. This is just a step by step to setting it up with our webpack bundler so that during a build it takes all our .scss modules and compiles them into a single css file which is referenced in index.html*
+
+## Install Dependencies
+*SASS-WEBPACK requires a few libraries in order to work the way we want - realistically it only needs node-sass. But because we want webpack to be able to read and compile it we also need a few style-loading libraries in order for webpack to deal with .scss file type*
+
+  - Run `npm i -D node-sass sass-loader css-loader style-loader`
+  
+*Then we also want webpack to bundle all our separate sass files into a single file and generate a stylesheet link in index.html - for that we need a plugin*
+
+  - Run `npm i -D extract-text-webpack-plugin@next`
+
+## Add some styling to our App component.
+  
+  - In `components/app/App.js` add a class "app-container" to the surrounding div element.
+
+    ```
+    <div className="app-container">
+      <h1>{title}</h1>
+      <button
+        onClick={((e) => {
+          this.handleClick('I\'ve done clicked the button');
+        })}
+      >
+        Test Click
+      </button>
+    </div>
+    ```
+  
+  *Note: In jsx (react) the syntax for adding a DOM class is `className=""` instead of `class=""`*
+  
+  - Then within the components/app directory - create App.scss. This will host only the styling for the App component and is a pattern we'll use throughout development.
+
+  - Add the following to App.scss
+  
+    ```
+    .app-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: auto;
+      background: red;
+      padding: 20px;
+    }
+    ```
+
+  *this is just some test styling to make sure everything is working when we're done.*
+
+  - Now we want to import this into our app component - add `import './App.scss'` at the top of App.js. Your file should look like the following:
+
+    ```
+    import PropTypes from 'prop-types';
+
+    import './App.scss';
+
+    class App extends Component {
+      static propTypes = {
+        title: PropTypes.string.isRequired
+      }
+
+      handleClick = (msg) => {
+        alert(msg);
+      }
+
+      render() {
+        const { title } = this.props;
+
+        return (
+          <div className="app-container">
+            <h1>{title}</h1>
+            <button
+              onClick={(() => {
+                this.handleClick('I\'ve done clicked the button');
+              })}
+            >
+              Test Click
+            </button>
+          </div>
+        );
+      }
+    }
+
+    export default App;
+
+    ```
+  
+  - Now start up webpack again `npm run dev`
+
+  *We should get an error here in the terminal telling us that webpack does not understand the file and that we may need the appropriate loader*
+
+  ## Configure Webpack for SASS
+
+  - First of we need to import the extract-text-plugin. At the top of `webpack-dev.config.js` add `const ExtractTextPlugin = require('extract-text-webpack-plugin');`
+
+  - Then add the plugin to the config - in the plugins array - add the following:
+
+    ```
+    new ExtractTextPlugin({
+      filename: '[name].css',
+      disable: process.env.NODE_ENV === 'development'
+    })
+    ```
+  *Note: The filename field will name our css file based on our entrypoint i.e app.css*
+  
+  - We also need to add the loader so that webpack can process sass files. In the module.rules array add:
+
+    ```
+    {
+      test: /\.scss$/,
+      use: ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: [
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'sass-loader'
+          }
+        ]
+      })
+    }
+    ```
+  *This tells webpack that for any files with .scss extension we want to compile them with sass-loader*
+
+  ### Your webpack-dev.config should now look like this:
+
+    ```
+    const webpack = require('webpack');
+    const HtmlWebpackPlugin = require('html-webpack-plugin');
+    const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+    module.exports = {
+      entry: {
+        app: [
+          'babel-polyfill', // polyfill transpiles es6 javascript => es5 javascript (certain browsers will not read es6 yet, but we want to write es6)
+          './src/app/app' // This is the point where the bundle begins
+        ],
+      },
+      output: {
+        filename: '[name].js', // Filename for output bundle - [name] place holder will be replaced by the entry point filename
+        path: `${__dirname}/build/app/`, // Directory where bundle file will be put
+        publicPath: '/build/' // public path to the app root
+      },
+      module: {
+        rules: [
+          {
+            test: /\.jsx?$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader'
+          },
+          {
+            test: /\.scss$/,
+            use: ExtractTextPlugin.extract({
+              fallback: 'style-loader',
+              use: [
+                {
+                  loader: 'css-loader'
+                },
+                {
+                  loader: 'sass-loader'
+                }
+              ]
+            })
+          }
+        ]
+      },
+      mode: 'development', // Determines how the bundle is built e.g(whether it's minified or not) - see: https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a 
+      devtool: 'eval', // Again determines how the bundle is built - theres a few different options - eval is good for debugging in development
+      devServer: {
+        contentBase: './build', // This tells the devServer where to serve files from i.e where ever index.html is
+        port: 3200 // Port that the app will be served on - i.e http://localhost:3200
+      },
+      plugins: [
+        // This plugin bundles our scss files into browser readable css and generates the
+        // stylesheet link in index.html.
+        new ExtractTextPlugin({
+          filename: '[name].css',
+          disable: process.env.NODE_ENV === 'development'
+        }),
+        // This plugin will move our html files to the build folder and
+        // generate the <script> tags for our bundle
+        new HtmlWebpackPlugin({
+          template: './src/index.html', // The original html file
+          filename: '../index.html' // The output html file
+        })
+      ]
+    };
+    ```
+
+  You should now be able to run `npm run dev` and see that your styles are now working.
+
+  # WOOP!
+
+
