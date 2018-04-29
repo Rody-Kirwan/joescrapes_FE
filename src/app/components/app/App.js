@@ -1,30 +1,47 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import Event from '../event';
+import initFonts from '../../font';
+import schedule from '../../../data/schedule';
+import sendCalendarRequest from '../../modules/events/api';
 
 import './App.scss';
 
 class App extends Component {
-  static propTypes = {
-    title: PropTypes.string.isRequired
+  constructor() {
+    super();
+    initFonts();
   }
 
-  handleClick = (msg) => {
-    alert(msg);
+  state = {
+    user: 'rody.kirwan@gmail.com',
+    selectedArtists: []
+  }
+
+  selectArtist = (artist) => {
+    const { user, selectedArtists } = this.state;
+
+    sendCalendarRequest({
+      user,
+      artist
+    }).then(() => this.setState({
+      selectedArtists: [selectedArtists, artist]
+    }));
   }
 
   render() {
-    const { title } = this.props;
+    const { selectedArtists } = this.state;
 
     return (
       <div className="app-container">
-        <h1>{title}</h1>
-        <button
-          onClick={(() => {
-            this.handleClick('I\'ve done clicked the button');
-          })}
-        >
-          Test Click
-        </button>
+        { schedule.map(show => (
+          <Event
+            selected={selectedArtists.includes(show.title)}
+            selectArtist={this.selectArtist}
+            show={show}
+            key={show.title.split(' ').join('_')}
+          />
+        ))
+        }
       </div>
     );
   }

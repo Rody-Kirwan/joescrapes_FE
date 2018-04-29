@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     app: [
       'babel-polyfill', // polyfill transpiles es6 javascript => es5 javascript (certain browsers will not read es6 yet, but we want to write es6)
+      'whatwg-fetch', // This will globalise the fetch method that we will use for XHRhttp requests
       './src/app/app' // This is the point where the bundle begins
     ],
   },
