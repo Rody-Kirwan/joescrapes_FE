@@ -311,17 +311,6 @@ module.exports = {
  # BOSH!
 
 
-
-
-
-
-
-
-
-
-
-
-
 # Add CSS support using SASS as a pre-processor
 
 *SASS is basically a pumped up CSS processor. You can use nesting, create variables and write functions that outpucan then be transpiled into normal CSS that any browser can read. The basic syntax is the same so not much of a learning curve from writing normal CSS. This is just a step by step to setting it up with our webpack bundler so that during a build it takes all our .scss modules and compiles them into a single css file which is referenced in index.html*
@@ -514,6 +503,33 @@ module.exports = {
 
   You should now be able to run `npm run dev` and see that your styles are now working.
 
-  # WOOP!
+# WOOP!
+
+
+# Add Icon Support - Font Awesome
+
+  *This is just a small step to add an icon library that we can use throughout the application. We'll use the font-awesome-react library as it seems pretty simple to implement and maintain*
+
+## Install Dependencies
+
+  - Run `npm i --save @fortawesome/fontawesome @fortawesome/react-fontawesome @fortawesome/fontawesome-free-brands @fortawesome/fontawesome-free-solid`
+
+  - Create an icons.js - Run `touch ./src/app/icons.js`
+
+  - Add the following to icons.js
+
+    ```
+    import fontawesome from '@fortawesome/fontawesome';
+    import brands from '@fortawesome/fontawesome-free-brands';
+    import { faCheckSquare, faCoffee } from '@fortawesome/fontawesome-free-solid';
+
+
+    const initIcons = () => fontawesome.library.add(brands, faCheckSquare, faCoffee);
+
+    export default initIcons;
+    ```
+*Now we import icons here as needed - we'll initialise thee library in App.js later*
+# Thats it! 
+
 
 
