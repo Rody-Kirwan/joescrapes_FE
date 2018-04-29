@@ -533,3 +533,502 @@ module.exports = {
 
 
 
+# Add Component State
+
+*So this is a pretty big leap into actually having a working Application. When I talk about state - I mean data storage and maintenance for a component tree.*
+*For this step we want to use our test data (from the scheduleNTS.json) to populate the App component with a list of Event Components for each json event.*
+*Then - When the user selects an event - we want to do two things.*
+  - POST our data to an API which will create the calendar events via your script
+  - If that request is successful - we want to store the artist as a selecteArtist so that we can reflect that visually in the UI. [*Eventually we should store this in a persistent DB but this is good for now*]
+
+
+## Create and Import Mock Data
+*Obviously down the line we will be fetching this data from an API but for the moment we'll mock it here*
+
+  - Create a data folder containing schedule.js. Run `mkdir ./src/app/data && touch ./src/app/data/schedule.js`
+
+  - Convert your json into a JS Array of objects and export it from schedule.js *[See: the file above]*
+
+  - Import the data into App.js (At the top of the file)
+
+    ```
+    import schedule from '../../../data/schedule';
+    ```
+## Render Clickable Event Tiles
+  
+  *Now we want to create a clickable tile for each event. As schedule is an array we can loop over the array of objects and return a div element (with the event title) for each one.*
+
+
+  - Add the following to the render method in App.js:
+
+    ```
+    render() {
+
+      return (
+        <div className="app-container">
+          { schedule.map(event => (
+            <div
+              onClick={(() => alert(`clicked ${event.title}`))}
+              className="event"
+            >
+              { event.title }
+            </div>
+          ))
+          }
+        </div>
+      );
+    }
+    ```
+
+  *Now when you save you should see a plain list of all the event titles*
+  *We'll need some styling*
+
+  - Add the following to App.scss
+
+    ```
+    .event {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      // flex-basis: 10%;
+      flex-grow: 1;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 20px;
+      height: 100px;
+      background: #efefef;
+      border: 1px solid #ddd;
+      cursor: pointer;
+
+      &:focus {
+        outline: 0; // this just overrides browser highlighting of focused elements
+      }
+    }
+    ```
+
+  *Now you should have some nice clickable event tiles for each artist. Clicking on an element should throw a browser alert with the selected event name*
+
+## Store Selected Events in Component State
+*Instead of throwing an alert message with the event name - we want to store each selected event in our Application state. This way we can reflect selected events in the UI by giving those tiles a different colour.*
+
+  - First of all we need to add a component-state object with initial values - with in App.js add:
+
+    ```
+    state = {
+      user: 'rody.kirwan@gmail.com',
+      selectedEvents: []
+    }
+    ```
+
+  - We also want to add a function that will update selectedEvents with each event we click on:
+
+    ```
+    selectEvent = event => {
+      const { selectedEvents } = this.state;
+
+      this.setState({
+        selectedEvents: [...selectedEvents, event]
+      });
+    }
+    ```
+  *Above you take the existing selectedEvents array from the state - then we reset the state with a new array containing the existing selectedEvents and the new event*
+  *We want to call this function in place of our alert()*
+  *Note: the `[...selectedEvents]` syntax is known as object-spread - it will take the contents of one object or array and spread them into the new object*
+  ### Important: Each time setState is called the component will re-render to reflect the updated data
+
+  - Update the onClick function to call `selectEvent()`
+
+    ```
+    <div className="app-container">
+      { schedule.map(event => (
+        <div
+          onClick={(() => this.selectEvent(event.title))}
+          className="event"
+        >
+          { event.title }
+        </div>
+      ))
+      }
+    </div>
+    ```
+
+  *Now each time we click a tile the event name is added to our selectedEvents array. With this in place we can track which tiles have been selected by checking if the title exists in the array*
+  *If the title exists in the array - we are going to change the background colour of the tile to blue by adding a CSS class*
+
+  - Update the render function with the following:
+
+    ```
+    render() {
+      const { selectedEvents } = this.state;
+
+      return (
+        <div className="app-container">
+          { schedule.map(event => (
+            <div
+              onClick={(() => this.selectEvent(event.title))}
+              className={`event ${selectedEvents.includes(event.title) ? 'selected' : ''}`}
+            >
+              { event.title }
+            </div>
+          ))
+          }
+        </div>
+      );
+    }
+    ```
+  ### Probably a few things to clarify here
+  *As you can see I've updated the className of the event tile with - what's called - a template literal. Using backticks instead of quote marks we can concatenate strings with JS expressions wrapped in ${}.*
+  *The expression used above is basically a one-line if statement. (A pattern used a lot in JS.) It would equate to the following:*
+
+    ```
+    if (selectedEvents includes(event.title)) {
+      print 'selected'
+    } else {
+      print = ''
+    }
+    ```
+
+  *So for any selected tile will receive an added css class 'selected'*
+
+  *I'm also using a pattern called "object destructuring" to declare variables - i.e `const { selectedEvents } = this.state`*
+  *This is basically a means of plucking object attributes into separate variables. `const selectedEvents = this.state.selectedEvents`*
+  *I suppose the pattern becomes more useful when you want to do something like `const { a, b, c, d, e } = obj`*
+
+  - Now we need to add a modifier class to the CSS. In App.scss add the following for .event:
+
+    ```
+    &.selected {
+      background: aliceblue;
+    }
+    ```
+
+  *App.scss should look like this:*
+
+    ```
+    .app-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      // height: 100%;
+
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        width: 200px;
+      }
+    }
+
+    .event {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 20px;
+      height: 100px;
+      background: #efefef;
+      border: 1px solid #ddd;
+      cursor: pointer;
+
+      &.selected {
+        background: aliceblue;
+      }
+
+      &:focus {
+        outline: 0;
+      }
+    }
+    ```
+  
+  *App.js should look like this:*
+
+    ```
+    import React, { Component } from 'react';
+    import schedule from '../../../data/schedule';
+
+    import './App.scss';
+
+    class App extends Component {
+      state = {
+        user: 'rody.kirwan@gmail.com',
+        selectedEvents: []
+      }
+
+      selectEvent = (event) => {
+        const { selectedEvents } = this.state;
+
+        this.setState({
+          selectedEvents: [...selectedEvents, event]
+        });
+      }
+
+      render() {
+        const { selectedEvents } = this.state;
+
+        return (
+          <div className="app-container">
+            { schedule.map(event => (
+              <div
+                onClick={(() => this.selectEvent(event.title))}
+                className={`event ${selectedEvents.includes(event.title) ? 'selected' : ''}`}
+              >
+                { event.title }
+              </div>
+            ))
+            }
+          </div>
+        );
+      }
+    }
+
+    export default App;
+    ```
+
+
+  **Now selecting tiles should be turn them blue**
+
+ 
+## Move Event Tiles into Separate Component
+*In order to keep things neat we want to break things up into separate components where it makes sense. In this case - we should move our event tiles into a separate Event component and pass down the data and functionality via props*
+
+  - Create an event directory in components `mkdir src/app/components/event`
+  
+  - Create required component files `touch ./src/app/components/event/Event.js ./src/app/components/event/Event.scss ./src/app/components/event/index.js`
+
+  - To Event.js add the following:
+
+    ```
+    import React, { Component } from 'react';
+    import PropTypes from 'prop-types';
+
+    import './Event.scss';
+
+    class Event extends Component {
+      static propTypes = {
+        event: PropTypes.objectOf(PropTypes.string).isRequired,
+        selectEvent: PropTypes.func.isRequired,
+        selected: PropTypes.bool.isRequired
+      }
+
+      selectEvent = title => this.props.selectEvent(title)
+
+      render() {
+        const { event, selected } = this.props;
+        const isSelected = selected ? 'selected' : '';
+        return (
+          <div
+            onClick={(() => this.selectEvent(event.title))}
+            className={`event ${isSelected}`}
+          >
+            { event.title }
+          </div>
+        );
+      }
+    }
+
+    export default Event;
+    ```
+
+  - Then move the CSS for `.event` from App.scss to Event.scss
+
+    ```
+    // Event.scss
+
+    .event {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      // flex-basis: 10%;
+      flex-grow: 1;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 20px;
+      height: 100px;
+      background: #efefef;
+      border: 1px solid #ddd;
+      cursor: pointer;
+
+      &.selected {
+        background: aliceblue;
+      }
+
+      &:focus {
+        outline: 0;
+      }
+    }
+    ```
+
+  - Finally in event/index.js add the following:
+
+    ```
+    export { default } from './Event'
+    ```
+
+  *We don't want low level components to have any state management or complexity, so we pass all functions and data via props from it's parent - in this case App.js*
+  *Props are basically function parameters - Here, in the propTypes object we are telling the component that we expect/require 3 parameters for the component to work:*
+
+  - An "event" which should be an object
+  - "selectArtist" which should be a function
+  - "selected" which is a boolean
+  
+
+
+  *Now we can update App.js to use our new component*
+
+  - Import the Event Component `import Event from '../event';`
+
+  - Replace the schedule.map function with the following:
+
+    ```
+     { schedule.map(event => (
+        <Event
+          selected={selectedEvents.includes(event.title)}
+          selectEvent={this.selectEvent}
+          event={event}
+          key={event.title.split(' ').join('_')}
+        />
+      ))
+      }
+    ```
+
+  *App.js should now look like this:*
+
+    ```
+    import React, { Component } from 'react';
+    import Event from '../event';
+    import schedule from '../../../data/schedule';
+
+    import './App.scss';
+
+    class App extends Component {
+      state = {
+        user: 'rody.kirwan@gmail.com',
+        selectedEvents: []
+      }
+
+      selectEvent = (event) => {
+        const { user, selectedEvents } = this.state;
+
+        this.setState({
+          selectedEvents: [...selectedEvents, artist]
+        });
+      }
+
+      render() {
+        const { selectedEvents } = this.state;
+
+        return (
+          <div className="app-container">
+            { schedule.map(event => (
+              <Event
+                selected={selectedEvents.includes(event.title)}
+                selectEvent={this.selectEvent}
+                event={event}
+                key={event.title.split(' ').join('_')}
+              />
+            ))
+            }
+          </div>
+        );
+      }
+    }
+
+    export default App;
+    ```
+  *Instead of renering a div element for each event - we now render an Event component using .jsx syntax `<Event />` we can then pass props down to the component like html attributes*
+  **Note: The key attribute should be a unique id for each element in a loop.* 
+
+
+## POST Selected Events to an API
+*Currently when we click an "Event Tile" we are only adding superficial functionality. Nothing is actually changing except our display*
+*Before we store our selected event we want to POST a request to the server to initiate the Google Calendar Script. Only when that request is successful do we want to store our event as selected*
+
+  - Install fetch library for http requests `npm i --save fetch`
+
+  *We want the fetch function to be global so we will add the dependency as an entry in webpack config*
+
+  - Update webpack-dev.config with the following:
+
+    ```
+    entry: {
+      app: [
+        'babel-polyfill', // polyfill transpiles es6 javascript => es5 javascript (certain browsers will not read es6 yet, but we want to write es6)
+        'whatwg-fetch', // This will globalise the fetch method that we will use for XHRhttp requests
+        './src/app/app' // This is the point where the bundle begins
+      ],
+    },
+    ```
+  
+  - Create an app/modules directory `mkdir src/app/modules` [*the modules directory will eventually manage all data but for now we will just maintain API requests*]
+
+  - Create an events directory with an api.js file `mkdir src/app/modules/events && touch api.js`
+
+  - Add the following function to api.js:
+
+    ```
+    const sendCalendarRequest = (payload) => {
+    const url = 'api/calendar/add';
+
+    const OPTIONS = {
+      credentials: 'same-origin',
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    };
+
+    return fetch(url, OPTIONS)
+      .then((response) => {
+        if (!response.ok) {
+          return Promise.reject(response);
+        }
+        return Promise.resolve(response.json());
+      })
+      .then(json => json);
+    };
+
+    export default sendCalendarRequest;
+    ```
+  
+
+  - Import the function in our App.js component `import sendCalendarRequest from '../../modules/events/api';`
+
+  - Now update the selectEvent function:
+
+    ```
+    selectEvent = (event) => {
+      const { user, selectedEvents } = this.state;
+
+      sendCalendarRequest({
+        user,
+        event
+      }).then(() => this.setState({
+        selectedEvents: [...selectedEvents, event]
+      }));
+    }
+    ```
+
+  *JS uses something called promises for async functions (like http request).*
+
+  **A promise has three states:**
+
+  - pending (operation is in-flight)
+  - fulfilled (operation is successful)
+  - rejected (operation failed)
+
+  *Here we are sending our data `{ user: 'rody.kirwan@gmail.com', event: event }` to an API at the url specified in the fetch function.*
+  *When that API responds with a success - then we add our event to selectedEvents thereby truely reflecting the persisted state of our application*
+
+  **This request will return with a 404 fail at the moment as the endpoint does not exist**
+  *However, you can check the network tab to verify the request is being made*
+
+  # Frontend Done! 
+  ## For the moment
