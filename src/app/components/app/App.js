@@ -1,44 +1,47 @@
 import React, { Component } from 'react';
 import Event from '../event';
-import initFonts from '../../font';
+import initIcons from '../../icons';
 import schedule from '../../../data/schedule';
-import sendCalendarRequest from '../../modules/events/api';
+// import sendCalendarRequest from '../../modules/events/api';
 
 import './App.scss';
 
 class App extends Component {
   constructor() {
     super();
-    initFonts();
+    initIcons();
   }
 
   state = {
-    user: 'rody.kirwan@gmail.com',
-    selectedArtists: []
+    // user: 'rody.kirwan@gmail.com',
+    selectedEvents: []
   }
 
-  selectArtist = (artist) => {
-    const { user, selectedArtists } = this.state;
+  selectEvent = (event) => {
+    const { /* user, */ selectedEvents } = this.state;
 
-    sendCalendarRequest({
-      user,
-      artist
-    }).then(() => this.setState({
-      selectedArtists: [selectedArtists, artist]
-    }));
+    // sendCalendarRequest({
+    //   user,
+    //   event
+    // }).then(() => this.setState({
+    //   selectedEvents: [...selectedEvents, event]
+    // }));
+    this.setState({
+      selectedEvents: [...selectedEvents, event]
+    });
   }
 
   render() {
-    const { selectedArtists } = this.state;
+    const { selectedEvents } = this.state;
 
     return (
       <div className="app-container">
-        { schedule.map(show => (
+        { schedule.map(event => (
           <Event
-            selected={selectedArtists.includes(show.title)}
-            selectArtist={this.selectArtist}
-            show={show}
-            key={show.title.split(' ').join('_')}
+            selected={selectedEvents.includes(event.title)}
+            selectEvent={this.selectEvent}
+            event={event}
+            key={event.title.split(' ').join('_')}
           />
         ))
         }

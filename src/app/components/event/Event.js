@@ -5,25 +5,25 @@ import './Event.scss';
 
 class Event extends Component {
   static propTypes = {
-    show: PropTypes.objectOf(PropTypes.string).isRequired,
-    selectArtist: PropTypes.func.isRequired,
+    event: PropTypes.objectOf(PropTypes.string).isRequired,
+    selectEvent: PropTypes.func.isRequired,
     selected: PropTypes.bool.isRequired
   }
 
-  selectArtist = title => this.props.selectArtist(title)
+  selectEvent = title => this.props.selectEvent(title)
 
   render() {
-    const { show, selected } = this.props;
+    const { event, selected } = this.props;
     const isSelected = selected ? 'selected' : '';
     return (
       <div
         role="button"
         tabIndex="0"
-        onKeyDown={(() => this.selectArtist(show.title))}
-        onClick={(() => this.selectArtist(show.title))}
+        onKeyDown={(() => this.selectEvent(event.title))}
+        onClick={(() => this.selectEvent(event.title))}
         className={`event ${isSelected}`}
       >
-        { show.title }
+        { event.title }
       </div>
     );
   }
