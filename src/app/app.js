@@ -4,6 +4,6 @@ import { render } from 'react-dom';
 import App from './components/app';
 
 render(
-  <App title="My Test Title" />,
+  <App />,
   document.getElementById('root')
 );

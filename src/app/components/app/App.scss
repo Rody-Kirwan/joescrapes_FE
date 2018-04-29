@@ -1,8 +1,14 @@
 .app-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: auto;
-  background: red;
-  padding: 20px;
+  flex-wrap: wrap;
+  // height: 100%;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    width: 200px;
+  }
 }
