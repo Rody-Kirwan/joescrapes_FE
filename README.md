@@ -1095,8 +1095,14 @@ module.exports = {
     ...
     ```
 
+  - Just realised `esint_d` lib won't accept the resolver so just update the "lint" script in `package.json` to:
+
+      ```
+      "lint": "eslint src --ext js,jsx"
+      ```
 
   # That's it for the moment as far as the frontend is concerned! 
   ## We need to build a small node server that will accept our calendar request.
 
   - Head over to  https://github.com/Rody-Kirwan/joescrapes_BE.
+
