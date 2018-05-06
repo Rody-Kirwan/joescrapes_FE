@@ -1030,5 +1030,79 @@ module.exports = {
   **This request will return with a 404 fail at the moment as the endpoint does not exist**
   *However, you can check the network tab to verify the request is being made*
 
-  # Frontend Done! 
-  ## For the moment
+
+
+
+  # Add Support for Absolute Filepaths
+  *This step is quite a small thing. I just want to remove the relative filepaths from our module imports i.e (`import x from '../../../components/x'` => `import x from 'components/x'`).*
+  *For this we need to install a path resolver plugin and config*
+
+  ## Install Dependencies
+
+  - Run npm i --save babel-plugin-module-resolver eslint-import-resolver-babel-module
+
+  *Note: Normally we would only need the 'babel-plugin' for this but because we're running lint tests before each push - we also need eslint to resolve the paths as well.*
+
+  - In `.babelrc` add the following to the plugins array:
+
+      ```
+      "plugins": [
+        "transform-object-rest-spread",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs",
+        [
+          "module-resolver",
+          {
+            "root": "./",
+            "alias": {
+              "components": "./src/app/components",
+              "data": "./src/data"
+            }
+          }
+        ]
+      ]
+      ```
+    
+  *So now when we `import foo from 'components/foo'` babel will check the module-resolver plugin and look for an alias from 'components'. It will resolve the filepath as if accessing from the root of the app*
+
+  - Then we just need to tell eslint to use the babel-plugin. To `eslint.rc` - below the "rules" field - add:
+
+      ```
+      "settings": {
+        "import/resolver": {
+          "babel-module": {}
+        }
+      }
+      ```
+
+  - Finally, we can change our relative file paths for 'data' and 'components' directory
+
+    ```
+    // app/app.js
+
+    import App from 'components/app';
+
+    ...
+
+    ```
+
+    ```
+    // components/app/App.js
+
+    import Event from 'components/event';
+    import schedule from 'data/schedule';   
+
+    ...
+    ```
+
+  - Just realised `esint_d` lib won't accept the resolver so just update the "lint" script in `package.json` to:
+
+      ```
+      "lint": "eslint src --ext js,jsx"
+      ```
+
+  # That's it for the moment as far as the frontend is concerned! 
+  ## We need to build a small node server that will accept our calendar request.
+
+  - Head over to  https://github.com/Rody-Kirwan/joescrapes_BE.
+
