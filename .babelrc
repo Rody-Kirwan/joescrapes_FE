@@ -1,4 +1,18 @@
 {
   "presets": ["env", "react"],
-  "plugins": ["transform-object-rest-spread", "transform-class-properties", "transform-es2015-modules-commonjs"]
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    "transform-es2015-modules-commonjs",
+    [
+      "module-resolver",
+      {
+        "root": "./",
+        "alias": {
+          "components": "./src/app/components",
+          "data": "./src/data"
+        }
+      }
+    ]
+  ]
 }

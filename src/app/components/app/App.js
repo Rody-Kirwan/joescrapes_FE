@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import Event from '../event';
+import Event from 'components/event';
+import schedule from 'data/schedule';
+
+// No point adding an alias for this yet - we'll move it somewhere more reasonalbale at some point
 import initIcons from '../../icons';
-import schedule from '../../../data/schedule';
 // import sendCalendarRequest from '../../modules/events/api';
 
 import './App.scss';
